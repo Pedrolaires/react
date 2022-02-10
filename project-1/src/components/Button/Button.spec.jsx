@@ -39,4 +39,10 @@ describe('<Button />', () => {
 
   });
 
+  it('should match snapshot', () => {
+    const { container } = render(<Button text="Load more" disabled={false} />)
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(container.firstChild).toMatchSnapshot();
+  });
+
 });
