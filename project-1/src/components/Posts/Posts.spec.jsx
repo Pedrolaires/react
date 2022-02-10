@@ -21,9 +21,9 @@ const props = {
       title: 'title3',
       body: 'body3',
       cover: 'img/img3.png',
-    }
-  ]
-}
+    },
+  ],
+};
 
 const emptyProps = { posts: [] };
 
@@ -38,14 +38,13 @@ describe('<Posts />', () => {
     expect(screen.getByRole('img', { name: 'title3' })).toHaveAttribute('src', 'img/img3.png');
   });
 
-  it('shouldnt render any post', () => {
+  it("shouldn't render any post", () => {
     render(<Posts {...emptyProps} />);
     expect(screen.queryByRole('heading', { name: /title/i })).not.toBeInTheDocument();
   });
 
   it('should match snapshot', () => {
     const { container } = render(<Posts {...props} />);
-    // eslint-disable-next-line testing-library/no-node-access
     expect(container.firstChild).toMatchSnapshot();
   });
-})
+});

@@ -1,9 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event';
 
 import { TextInput } from '.';
-
-
 
 describe('<TextInput />', () => {
   it('should have a value of "value"', () => {
@@ -12,7 +10,7 @@ describe('<TextInput />', () => {
 
     const input = screen.getByPlaceholderText(/type your search/i);
 
-    expect(input.value).toBe('test')
+    expect(input.value).toBe('test');
   });
 
   it('should call handleChange function on each key pressed', () => {
@@ -33,8 +31,9 @@ describe('<TextInput />', () => {
   });
 
   it('should match snapshot', () => {
-    const { container } = render(<TextInput />)
+    const fn = jest.fn();
+    const { container } = render(<TextInput onChange={fn} value={''} />);
 
     expect(container).toMatchSnapshot();
   });
-}) 
+});

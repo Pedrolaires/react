@@ -15,13 +15,10 @@ describe('<PostCard />', () => {
     expect(img).toHaveAttribute('src', props.cover);
     expect(h2).toBeInTheDocument();
     expect(screen.getByText('body1')).toBeInTheDocument();
-
   });
   it('should match snapshot', () => {
     const { container } = render(<PostCard {...props} />);
 
-    // eslint-disable-next-line testing-library/no-node-access
     expect(container.firstChild).toMatchSnapshot();
   });
-
 });
