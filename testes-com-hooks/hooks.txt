@@ -1,0 +1,186 @@
+Regra dos Hooks -> https://pt-br.reactjs.org/docs/hooks-rules.html
+
+
+Não usar Hooks dentro de blocks, ou seja, não usar em loops, condicionais e funções aninhadas
+
+https://pt-br.reactjs.org/docs/hooks-reference
+
+**useState () => basicamente um hook que cria um estado
+
+**useEffect () => {
+
+# Trata efeitos colaterais
+  
+  // componentDidUpdate - executa quando o component atualiza
+  useEffect(() => {
+    console.log('componentDiUpdate');
+  });
+
+  // componentDidMount - executa 1x
+  useEffect(() => {
+    console.log('componentDidMount');
+
+    document.querySelector('h1')?.addEventListener('click', eventfn);
+
+    //ComponentwillUnmount - remove o "lixo" deixado no componente
+    return () => {
+      document.querySelector('h1')?.removeEventListener('click', eventfn);
+    };
+  }, []);
+
+  //com dependência - executa quando a [dependência] mudar
+  useEffect(() => {
+    console.log('Contador 1 Mudou para: ', counter);
+    console.log('Contador 2 Mudou para: ', counter2);
+  }, [counter, counter2]);
+
+
+  Sempre que um componente atualizar o useEffect será chamado, depois, ele irá checar todas as
+  dependências do array e, se alguma delas mudar, useEffect será chamado novamente.
+
+}
+
+**useCallback () => {
+Utilizado em otimizações
+
+  No caso usei um componente Button que recebeu a função incrementCounter no onClick como props
+  utilizando o 'prop-types' e salvando essa função do componente na memória com o React.memo
+
+  const incrementCounter = useCallback((num) => {
+    setCounter((c) => c + num);
+  }, []);
+
+  as dependências são passadas no segundo argumento do useCallBack como um array, caso a
+  dependência mude a função será chamada novamente, renderizando o botão de novo.
+  Como o foi passado ao setCounter uma função de callback, a função incrementCounter não
+  possui dependências externas.
+
+  Basicamente em classes somente o render() é chamado quando o estado do componente muda,
+  já em com funções, a função inteira é recriada. O useCallback resolve o problema de 
+  re-renderizar todas as funções que estão no componente, e assim, evitando renderizando todo o
+  componente de novo.
+'
+  Ou seja, a gente 'informa' ao componente que a função não foi alterada durante as renderizações.
+
+} 
+
+**useMemo () =>{
+  Tem a mesma função do useCallback, porém salva valores.
+  Exemplo de uso: quando houver u onChange no input.
+
+  {useMemo(() => {
+        return posts.length > 0 && posts.map((post) => <Post key={post.id} post={post} />);
+      }, [posts])}
+
+      isso no jsx
+
+}
+
+**useRef () => {
+  querySelector em forma de hook;
+  Pega um elemento da Dom.
+  setar current.focus(); etc
+
+
+}
+
+**useContext () => {
+  Cria um contexto
+  Utilizado geralmente com o Reducer  
+}
+
+**useReducer () =>{
+
+  Manipulador de estado
+
+  const reducer = (state, action) => {
+  return { ...state };
+  };
+
+   const [state, dispatch] = useReducer(reducer, Estado Inicial Aqui);
+
+  dispatch dispara ações
+}
+
+** useLayoutEffect () => {
+  Se estiver fazendo alguma manipulação na DOM e a atualização estiver dessincronizada é útil, mas é mais recomendado utilizar o useEffect
+
+
+}
+__________________________________________________________________________
+
+component -> um jsx que irá receber o contexto e trata-lo da forma que quiser. Utiliza o hook "useContext(context)" com o contexto que foi passado pelo Provider(contexto acima)
+Portanto ele já tem o State e Dispatch. Pode utilizar o useEffect para realizar uma chamada quando o componente for montado.
+Por exemplo: Chama uma action que irá carregar POSTS utilizando uma fetch API, que por sua vez, dispara(dispatch) um tipo de ação e o payload para o reducer, que por sua vez,
+receberá a ação, e retornara o estado modificado com o payload.
+  - Importante se lembrar de limpar as chamadas do component, no caso, encapsular o retorno em actions em uma função e utilizar uma flag(true) com useRef no component que ao chamar a action
+(que receberá a função encapsulada de dispatch como retorno da action no ".then()") utilizará a flag em uma condicional para checar se o componente está montado ou não.Se o
+component estiver montado ( se ele estiver sendo utilizado ) a ação é executada, se não (caso esteja em outra rota) a flag é movida para falso.  
+
+
+
+Provider -> recebe o {children(componente) } que irá receber o estado e o reducer "[State, Dispatch] = useReducer(reducer, data)"
+e passa os dois dentro do "<Context.Provider value={{ State, Dispatch }}> <Context.Provider>"  -> usa o propTypes.
+O Provider irá no App, que irá passar o contexto para seus filhos.
+
+
+types -> Cria um padrão para o nome das ações que serão chamadas no dispatch;
+
+actions -> cria funções para cada uma das ações (ex: carregar dados),recebe e chama o dispatch para mudar o contexto
+
+data -> os dados que serão passados para o provider (dados que serão manipulados no componente).
+
+reducer -> recebe o estado atual e a ação que será executada.Cria condicionais dependendo do tipo recebido pelas actions e
+muda/retorna o estado do componente com o payload recebido na action
+
+context -> cria um contexto com o "React.createContext( valores iniciais do contexto podem ser passados aqui ou no value do Provider )";
+
+
+Hook Flow Diagram -> https://github.com/donavon/hook-flow/blob/master/hook-flow.png
+
+
+Error Boundaries -> cria um 'Limite' para os erros, não permitido que eles se propaguem para a pagina inteira. https://pt-br.reactjs.org/docs/error-boundaries.html
+
+
+React.Children = () => {
+  é geralmente utilizado como retorno de um component Parent. Ex:
+
+  //basicamente dentro do React.cloneElement são passados as props para todos os childs do elemento Parent
+
+  const Parent = ({children}) => {
+    return React.Children.map(children, (child) => {
+      const newChild = React.cloneElement(child, !!! PROPS AQUI !!!);
+      return (newChild);
+    } )
+  }
+}
+
+________________________________________________________________________________________________________________
+Compound Components () =>{
+  como se fosse o select do html que, sem as options não faz nada.
+
+  Passa as props para todos os elementos filhos que, sozinhos não fariam nada.
+
+  Exemplos com context API na pasta de components
+}
+
+________________________________________________________________________________________________________________
+
+
+Code splitting () =>{
+  *Somente quando necessário.
+
+
+  Geralmente utilizado para otimizar a aplicação e feito na refatoração do código.
+
+  Quando se utiliza aplicações React, o Webpack já é configurado automaticamente, então, o bundle já é gerado automaticamente.
+
+  Em alguns casos pode ser preciso "dividir" o bundle final para que o usuário veja somente o que é preciso. A medida que a 
+  navegação é feita mais partes do código são geradas.
+}
+
+
+Roteamento com react-rotuer-dom () => {
+	npm i react-router-dom
+
+}
